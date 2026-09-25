@@ -4,27 +4,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#172236" />
-  <title>RAVEN LAB - حاسبة تسعير المطبوعات</title>
+  <title>RAVEN LAB - حاسبة التكلفة والتسعير</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #172236;
-      --bg-soft: #21334f;
-      --card: rgba(42, 61, 90, 0.74);
-      --card-solid: #243752;
-      --panel: #16243a;
-      --panel-2: #1c2d48;
-      --gold: #f8c886;
-      --gold-strong: #ffc46b;
-      --text: #ffffff;
-      --muted: #b8c4d8;
-      --muted-2: #8796ae;
-      --border: rgba(255, 255, 255, 0.1);
+      --bg: #0f1117;
+      --bg-soft: #171b23;
+      --card: rgba(15, 17, 23, 0.88);
+      --card-solid: #171b23;
+      --panel: #11151c;
+      --panel-2: #171b23;
+      --gold: #aed349;
+      --gold-strong: #9cc03d;
+      --text: #f8fafc;
+      --muted: #a7b0bf;
+      --muted-2: #7f8998;
+      --border: #2b3240;
       --danger: #ff7b7b;
-      --success: #68d391;
-      --shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
+      --success: #aed349;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
       --radius-xl: 26px;
       --radius-lg: 20px;
       --radius-md: 14px;
@@ -44,10 +44,7 @@
     body {
       min-height: 100vh;
       font-family: "Cairo", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top right, rgba(248, 200, 134, 0.12), transparent 30%),
-        radial-gradient(circle at top left, rgba(105, 145, 205, 0.18), transparent 28%),
-        linear-gradient(180deg, #223757 0%, var(--bg) 100%);
+      background: radial-gradient(circle at top right, rgba(174, 211, 73, 0.10), transparent 28%), linear-gradient(180deg, #171b23 0%, var(--bg) 100%);
       color: var(--text);
       line-height: 1.6;
       padding: 22px;
@@ -101,7 +98,7 @@
       position: absolute;
       inset-inline-start: -80px;
       top: -70px;
-      background: radial-gradient(circle, rgba(248, 200, 134, 0.18), transparent 65%);
+      background: radial-gradient(circle, rgba(174, 211, 73, 0.18), transparent 65%);
       pointer-events: none;
     }
 
@@ -110,8 +107,8 @@
       align-items: center;
       gap: 8px;
       color: var(--gold);
-      border: 1px solid rgba(248, 200, 134, 0.24);
-      background: rgba(248, 200, 134, 0.08);
+      border: 1px solid rgba(174, 211, 73, 0.24);
+      background: rgba(174, 211, 73, 0.08);
       padding: 7px 12px;
       border-radius: 999px;
       font-size: 0.88rem;
@@ -126,7 +123,7 @@
       letter-spacing: 1px;
       line-height: 1.15;
       margin-bottom: 8px;
-      text-shadow: 0 0 22px rgba(248, 200, 134, 0.24);
+      text-shadow: 0 0 22px rgba(174, 211, 73, 0.24);
     }
 
     .brand p {
@@ -141,7 +138,7 @@
       flex-direction: column;
       justify-content: space-between;
       gap: 14px;
-      background: linear-gradient(145deg, rgba(26, 40, 64, 0.92), rgba(42, 61, 90, 0.74));
+      background: linear-gradient(145deg, rgba(15,17,23,.96), rgba(23,27,35,.92));
     }
 
     .summary-label {
@@ -174,9 +171,9 @@
       border-radius: 16px;
       padding: 13px 14px;
       font-weight: 800;
-      color: #172236;
+      color: #111827;
       background: var(--gold);
-      box-shadow: 0 10px 24px rgba(248, 200, 134, 0.20);
+      box-shadow: 0 10px 24px rgba(174, 211, 73, 0.20);
       transition: transform 0.16s ease, opacity 0.16s ease, box-shadow 0.16s ease;
     }
 
@@ -263,8 +260,8 @@
       width: 31px;
       height: 31px;
       border-radius: 12px;
-      background: rgba(248, 200, 134, 0.12);
-      border: 1px solid rgba(248, 200, 134, 0.22);
+      background: rgba(174, 211, 73, 0.12);
+      border: 1px solid rgba(174, 211, 73, 0.22);
       color: var(--gold);
       font-size: 0.9rem;
       flex: 0 0 auto;
@@ -322,9 +319,9 @@
 
     input:focus,
     select:focus {
-      border-color: rgba(248, 200, 134, 0.72);
-      box-shadow: 0 0 0 4px rgba(248, 200, 134, 0.10);
-      background: #132034;
+      border-color: rgba(174, 211, 73, 0.72);
+      box-shadow: 0 0 0 4px rgba(174, 211, 73, 0.10);
+      background: #0f1117;
     }
 
     input[type="number"]::-webkit-outer-spin-button,
@@ -349,8 +346,8 @@
       align-items: flex-start;
       gap: 10px;
       color: var(--muted);
-      border: 1px solid rgba(248, 200, 134, 0.16);
-      background: rgba(248, 200, 134, 0.07);
+      border: 1px solid rgba(174, 211, 73, 0.16);
+      background: rgba(174, 211, 73, 0.07);
       border-radius: 16px;
       padding: 12px 14px;
       font-size: 0.88rem;
@@ -359,7 +356,7 @@
 
     .result-card {
       padding: 22px;
-      background: linear-gradient(145deg, rgba(22, 36, 58, 0.96), rgba(32, 50, 78, 0.86));
+      background: linear-gradient(145deg, rgba(15,17,23,.98), rgba(23,27,35,.94));
     }
 
     .result-card h2 {
@@ -398,8 +395,8 @@
     }
 
     .price-box.strong {
-      background: rgba(248, 200, 134, 0.13);
-      border-color: rgba(248, 200, 134, 0.30);
+      background: rgba(174, 211, 73, 0.13);
+      border-color: rgba(174, 211, 73, 0.30);
     }
 
     .price-box.success {
@@ -453,8 +450,8 @@
       font-size: 0.86rem;
       padding: 13px 14px;
       border-radius: 16px;
-      border: 1px solid rgba(248, 200, 134, 0.18);
-      background: rgba(248, 200, 134, 0.07);
+      border: 1px solid rgba(174, 211, 73, 0.18);
+      background: rgba(174, 211, 73, 0.07);
     }
 
     .toast {
@@ -462,8 +459,8 @@
       right: 18px;
       bottom: 18px;
       max-width: calc(100% - 36px);
-      background: #0f1a2b;
-      border: 1px solid rgba(248, 200, 134, 0.30);
+      background: #090b10;
+      border: 1px solid rgba(174, 211, 73, 0.30);
       color: var(--text);
       border-radius: 15px;
       box-shadow: var(--shadow);
@@ -552,16 +549,97 @@
         font-size: 0.84rem;
       }
     }
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .kpi {
+      padding: 11px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .kpi span { display:block; color:var(--muted-2); font-size:.76rem; }
+    .kpi b { display:block; color:var(--text); margin-top:2px; font-size:1rem; }
+    @media (max-width:640px){ .kpi-strip{grid-template-columns:1fr;} }
+
+  
+    /* Raven Lab store dark-theme alignment */
+    body {
+      color-scheme: dark;
+    }
+    .brand, .summary-card, .section, .result-card {
+      box-shadow: 0 20px 50px rgba(0,0,0,.42);
+    }
+    .brand,
+    .summary-card,
+    .section,
+    .result-card,
+    .price-box,
+    .kpi,
+    .status {
+      backdrop-filter: blur(16px);
+    }
+    .brand {
+      border-color: rgba(174,211,73,.12);
+    }
+    .eyebrow,
+    .pill-note,
+    .final-note {
+      border-color: rgba(174,211,73,.18);
+    }
+    .btn {
+      background: var(--gold);
+      color: #111827;
+      box-shadow: 0 10px 24px rgba(174,211,73,.16);
+    }
+    .btn:hover {
+      background: var(--gold-strong);
+    }
+    .btn.secondary {
+      background: #171b23;
+      color: var(--text);
+      border-color: #2b3240;
+    }
+    input,
+    select {
+      background: #11151c;
+      border-color: #2b3240;
+    }
+    input:hover,
+    select:hover {
+      border-color: #3a4352;
+    }
+    .price-box.strong {
+      background: rgba(174,211,73,.10);
+      border-color: rgba(174,211,73,.28);
+    }
+    .price-box.success {
+      background: rgba(174,211,73,.08);
+      border-color: rgba(174,211,73,.20);
+    }
+    .summary-price,
+    .price-box.strong b,
+    h1,
+    .section-title,
+    .result-card h2,
+    .step {
+      color: var(--gold);
+    }
+
   </style>
 </head>
 <body>
   <main class="app">
     <section class="hero" aria-label="مقدمة الحاسبة">
       <div class="brand">
-        <div class="eyebrow">🧾 حاسبة تسعير سهلة ودقيقة</div>
+        <div class="eyebrow">🧾 حاسبة تكلفة وتسعير RavenLab</div>
         <h1>RAVEN LAB</h1>
         <p>
-          أدخل أرقام السلايسر: الوزن، وقت الطباعة، عدد القطع، والتكاليف الإضافية. الحاسبة تفصل بين تكاليف القطعة الواحدة وتكاليف الطلب بالكامل حتى لا ينحسب التصميم أو التسويق أكثر من مرة.
+          احسب تكلفة التصنيع الفعلية، تكلفة القطعة، الربح، وهامش الربح. أدخل بيانات السلايسر والتكاليف المباشرة، وستحصل على سعر بيع مقترح واضح.
         </p>
       </div>
 
@@ -596,14 +674,15 @@
             <div class="field">
               <label for="filamentType">نوع الفلمنت</label>
               <select id="filamentType" name="filamentType">
-                <option value="20000">Esun PLA — 21,000 د.ع / كغم</option>
-                <option value="25000">old PLA+ — 20,000 د.ع / كغم</option>
-                <option value="25000">PLA+ — 25,000 د.ع / كغم</option>
-                <option value="33000">Glow — 33,000 د.ع / كغم</option>
-                <option value="33000">Petg — 17,000 د.ع / كغم</option>
-                <option value="33000">Esun pla+ — 25,000 د.ع / كغم</option>
-                <option value="custom">سعر مخصص</option>
-              </select>
+                  <option value="esun_pla" data-price="21000">eSUN PLA — 21,000 د.ع / كغم</option>
+                  <option value="pla" data-price="20000">PLA — 20,000 د.ع / كغم</option>
+                  <option value="pla_plus" data-price="21000">PLA+ — 21,000 د.ع / كغم</option>
+                  <option value="petg" data-price="17000">PETG — 17,000 د.ع / كغم</option>
+                  <option value="glow" data-price="33000">Glow PLA — 33,000 د.ع / كغم</option>
+                  <option value="tpu" data-price="">TPU — أدخل السعر</option>
+                  <option value="wood" data-price="">Wood PLA — أدخل السعر</option>
+                  <option value="custom" data-price="">نوع / سعر مخصص</option>
+                </select>
               <small>تم تصحيح أسعار الفلمنت داخل الحساب.</small>
             </div>
           </div>
@@ -611,7 +690,7 @@
           <div class="grid-2" style="margin-top: 13px;">
             <div class="field">
               <label for="filamentPrice">سعر الكيلو د.ع</label>
-              <input id="filamentPrice" name="filamentPrice" type="number" inputmode="decimal" min="0" step="500" value="20000">
+              <input id="filamentPrice" name="filamentPrice" type="number" inputmode="decimal" min="0" step="500" value="21000">
               <small>يمكن تعديله بدون تغيير الكود.</small>
             </div>
 
@@ -641,19 +720,28 @@
             </div>
 
             <div class="field">
-              <label for="hours">وقت الطباعة بالساعات</label>
-              <div class="input-row">
-                <input id="hours" name="hours" type="number" inputmode="decimal" min="0" step="0.1" placeholder="مثال: 5.5" required>
-                <select id="hoursMode" name="hoursMode" aria-label="نوع وقت الطباعة">
-                  <option value="total" selected>إجمالي الطلب</option>
-                  <option value="single">للقطعة الواحدة</option>
-                </select>
+                <label>وقت الطباعة</label>
+                <div class="grid-2">
+                  <div class="field">
+                    <input id="hours" name="hours" type="number" inputmode="numeric" min="0" step="1" placeholder="الساعات" required>
+                    <small>ساعات</small>
+                  </div>
+                  <div class="field">
+                    <input id="minutes" name="minutes" type="number" inputmode="numeric" min="0" max="59" step="1" value="0" placeholder="الدقائق">
+                    <small>دقائق</small>
+                  </div>
+                </div>
+                <div style="margin-top:10px">
+                  <select id="hoursMode" name="hoursMode" aria-label="نوع وقت الطباعة">
+                    <option value="total" selected>إجمالي الطلب / الطبعات</option>
+                    <option value="single">للقطعة الواحدة</option>
+                  </select>
+                </div>
+                <small>مثال: 4 ساعات و16 دقيقة. إذا أدخلت وقت القطعة الواحدة اختر «للقطعة الواحدة».</small>
               </div>
-              <small>وقت اللوحة كاملة أدق من ضرب وقت قطعة واحدة إذا كانت القطع تطبع معاً.</small>
             </div>
-          </div>
 
-          <div class="pill-note">💡 النتيجة تتحدث تلقائياً. لا تحتاج زر حساب.</div>
+            <div class="pill-note">💡 النتيجة تتحدث تلقائياً. لا تحتاج زر حساب.</div>💡 النتيجة تتحدث تلقائياً. لا تحتاج زر حساب.</div>
         </div>
 
         <details class="section" open>
@@ -690,6 +778,16 @@
                 <label for="marketing">تسويق / منصة للطلب بالكامل</label>
                 <input id="marketing" name="marketing" type="number" inputmode="decimal" min="0" step="250" value="500">
                 <small>لا يتم ضربه بعدد القطع.</small>
+              </div>
+              <div class="field">
+                <label for="salesCommission">عمولة موظف المبيعات / الطلب</label>
+                <input id="salesCommission" name="salesCommission" type="number" inputmode="decimal" min="0" step="250" value="2000">
+                <small>تكلفة ثابتة للطلب بالكامل، وليست لكل قطعة.</small>
+              </div>
+              <div class="field">
+                <label for="actualSell">سعر بيع فعلي للطلب (اختياري)</label>
+                <input id="actualSell" name="actualSell" type="number" inputmode="decimal" min="0" step="500" value="0">
+                <small>إذا أدخلته، سيظهر الربح الفعلي وهامش الربح مقارنةً بتكلفتك.</small>
               </div>
               <div class="field">
                 <label for="delivery">توصيل للطلب بالكامل</label>
@@ -748,8 +846,8 @@
             <div class="grid-2" style="margin-top: 13px;">
               <div class="field">
                 <label for="profit">نسبة الربح فوق التكلفة %</label>
-                <input id="profit" name="profit" type="number" inputmode="decimal" min="0" max="1000" step="1" value="50">
-                <small>50% هنا تعني: التكلفة × 1.5.</small>
+                <input id="profit" name="profit" type="number" inputmode="decimal" min="0" max="1000" step="1" value="60">
+                <small>60% هنا تعني: التكلفة × 1.60. غيّرها حسب المنتج.</small>
               </div>
               <div class="field">
                 <label for="taxes">رسوم/خصومات دفع %</label>
@@ -764,6 +862,11 @@
       <aside class="result-card" id="results" aria-live="polite">
         <h2>النتيجة التفصيلية</h2>
         <div class="status" id="statusBox">أدخل الوزن ووقت الطباعة لعرض الحساب.</div>
+        <div class="kpi-strip" id="kpiStrip" hidden>
+          <div class="kpi"><span>تكلفة الساعة</span><b id="kpiHour">—</b></div>
+          <div class="kpi"><span>تكلفة الغرام</span><b id="kpiGram">—</b></div>
+          <div class="kpi"><span>الوقت الإجمالي</span><b id="kpiTime">—</b></div>
+        </div>
         <div id="resultContent" hidden></div>
       </aside>
     </section>
@@ -782,17 +885,22 @@
     const filamentType = document.getElementById("filamentType");
     const filamentPrice = document.getElementById("filamentPrice");
     const toast = document.getElementById("toast");
+    const kpiStrip = document.getElementById("kpiStrip");
+    const kpiHour = document.getElementById("kpiHour");
+    const kpiGram = document.getElementById("kpiGram");
+    const kpiTime = document.getElementById("kpiTime");
 
-    const STORAGE_KEY = "ravenlab_print_pricing_v2";
+    const STORAGE_KEY = "ravenlab_print_pricing_v3";
 
     const defaults = {
       qty: 1,
-      filamentType: "20000",
-      filamentPrice: 20000,
+      filamentType: "esun_pla",
+      filamentPrice: 21000,
       roundTo: 500,
       weight: "",
       weightMode: "total",
       hours: "",
+      minutes: 0,
       hoursMode: "total",
       paint: 0,
       packaging: 1000,
@@ -800,6 +908,8 @@
       keychain: 0,
       design: 0,
       marketing: 500,
+      salesCommission: 2000,
+      actualSell: 0,
       delivery: 5000,
       minPrice: 0,
       printerHour: 300,
@@ -808,7 +918,7 @@
       waste: 8,
       fail: 15,
       workers: 0,
-      profit: 50,
+      profit: 60,
       taxes: 0
     };
 
@@ -841,7 +951,7 @@
       resultContent.hidden = true;
       copyBtn.disabled = true;
       quickSingle.textContent = "—";
-      quickBatch.textContent = message;
+      quickBatch.textContent = message;\n      kpiStrip.hidden = true;
     }
 
     function showToast(message) {
@@ -890,7 +1000,7 @@
     function calculate() {
       const qty = Math.max(1, Math.floor(numberValue("qty", 1)));
       const weightInput = numberValue("weight", 0);
-      const hoursInput = numberValue("hours", 0);
+      const hoursInput = numberValue("hours", 0) + (clamp(numberValue("minutes", 0), 0, 59) / 60);
 
       if (weightInput <= 0 || hoursInput <= 0) {
         setStatus("أدخل الوزن ووقت الطباعة لعرض الحساب.");
@@ -935,7 +1045,7 @@
         Math.max(0, numberValue("keychain", 0))
       ) * qty;
 
-      const fixedCosts = Math.max(0, numberValue("design", 0)) + Math.max(0, numberValue("marketing", 0));
+      const fixedCosts = Math.max(0, numberValue("design", 0)) + Math.max(0, numberValue("marketing", 0)) + Math.max(0, numberValue("salesCommission", 0));
       const beforeLabor = manufacturingCost + failureReserve + perPieceCosts + fixedCosts;
       const laborCost = beforeLabor * workers;
       const totalCost = beforeLabor + laborCost;
@@ -949,11 +1059,22 @@
       const totalWithDelivery = roundedBatch + delivery;
       const margin = roundedBatch > 0 ? ((roundedBatch - totalCost) / roundedBatch) * 100 : 0;
 
+      const actualSell = Math.max(0, numberValue("actualSell", 0));
+      const actualProfit = actualSell > 0 ? actualSell - totalCost : 0;
+      const actualMargin = actualSell > 0 ? (actualProfit / actualSell) * 100 : 0;
+      const actualPerPiece = actualSell > 0 ? actualSell / qty : 0;
+
       statusBox.hidden = true;
       resultContent.hidden = false;
       copyBtn.disabled = false;
       quickSingle.textContent = money(roundedSingle);
       quickBatch.textContent = `سعر الطلب: ${money(roundedBatch)} — مع التوصيل: ${money(totalWithDelivery)}`;
+      kpiStrip.hidden = false;
+      kpiHour.textContent = money(printerRate + electricityRate + maintenanceRate);
+      kpiGram.textContent = `${(kgPrice / 1000).toFixed(1)} د.ع`;
+      const wholeHours = Math.floor(totalHours);
+      const mins = Math.round((totalHours - wholeHours) * 60);
+      kpiTime.textContent = `${wholeHours} س ${mins} د`;
 
       resultContent.innerHTML = `
         <div class="price-grid">
@@ -977,7 +1098,7 @@
           <div class="line"><span>تشغيل الطابعة + كهرباء + صيانة</span><b>${money(machineCost)}</b></div>
           <div class="line"><span>احتياطي فشل الطباعة</span><b>${money(failureReserve)}</b></div>
           <div class="line"><span>تكاليف القطع الإضافية</span><b>${money(perPieceCosts)}</b></div>
-          <div class="line"><span>تكاليف ثابتة للطلب</span><b>${money(fixedCosts)}</b></div>
+          <div class="line"><span>تكاليف ثابتة للطلب (تصميم + تسويق + عمولة مبيعات)</span><b>${money(fixedCosts)}</b></div>
           <div class="line"><span>أجور العمالة</span><b>${money(laborCost)}</b></div>
           <div class="line"><span>تكلفة الطلب قبل الربح</span><b>${money(totalCost)}</b></div>
           <div class="line"><span>تكلفة القطعة قبل الربح</span><b>${money(costPerPiece)}</b></div>
@@ -995,11 +1116,11 @@
         `عدد القطع: ${qty}`,
         `الوزن الإجمالي المحسوب: ${totalWeight.toFixed(1)} غرام`,
         `وقت الطباعة الإجمالي المحسوب: ${totalHours.toFixed(1)} ساعة`,
-        `سعر كيلو الفلمنت: ${money(kgPrice)}`,
+        `نوع الفلمنت: ${filamentType.options[filamentType.selectedIndex].text}`,\n        `سعر كيلو الفلمنت: ${money(kgPrice)}`,
         `تكلفة القطعة قبل الربح: ${money(costPerPiece)}`,
         `سعر القطعة المقترح: ${money(roundedSingle)}`,
         `سعر الطلب المقترح: ${money(roundedBatch)}`,
-        `إجمالي الطلب مع التوصيل: ${money(totalWithDelivery)}`,
+        `إجمالي الطلب مع التوصيل: ${money(totalWithDelivery)}`,\n        ...(actualSell > 0 ? [`سعر البيع الفعلي: ${money(actualSell)}`, `الربح الفعلي: ${money(actualProfit)}`, `هامش الربح الفعلي: ${actualMargin.toFixed(1)}%`] : []),
         "ملاحظة: السعر النهائي يتم تأكيده من RavenLab بعد مراجعة الطلب."
       ].join("\n");
 
@@ -1028,15 +1149,22 @@
     }
 
     filamentType.addEventListener("change", () => {
-      if (filamentType.value !== "custom") {
-        filamentPrice.value = filamentType.value;
+      const selected = filamentType.options[filamentType.selectedIndex];
+      const presetPrice = selected?.dataset?.price;
+      if (presetPrice) {
+        filamentPrice.value = presetPrice;
       }
       calculate();
     });
 
     filamentPrice.addEventListener("input", () => {
-      const exactOption = [...filamentType.options].find((option) => option.value === filamentPrice.value);
-      filamentType.value = exactOption ? exactOption.value : "custom";
+      const currentPrice = Number(filamentPrice.value);
+      const selected = filamentType.options[filamentType.selectedIndex];
+      const presetPrice = Number(selected?.dataset?.price || NaN);
+
+      if (Number.isFinite(presetPrice) && presetPrice !== currentPrice) {
+        filamentType.value = "custom";
+      }
     });
 
     form.addEventListener("input", calculate);
