@@ -576,6 +576,52 @@
     input:hover, select:hover { border-color:#3a4352; }
     @media (max-width:700px){ .production-preview{grid-template-columns:repeat(2,minmax(0,1fr));} }
 
+  
+    .invoice-card {
+      margin-top: 16px;
+      background: #0d1117;
+      border: 1px solid rgba(174, 211, 73, 0.24);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .invoice-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(174, 211, 73, 0.06);
+    }
+    .invoice-head strong { color: var(--gold); font-size: 1rem; }
+    .invoice-body { padding: 15px 16px; }
+    .invoice-text {
+      direction: rtl;
+      text-align: right;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: "Cairo", system-ui, sans-serif;
+      font-size: .82rem;
+      line-height: 1.95;
+      color: #d9e0e8;
+      background: #090c11;
+      border: 1px solid #252c37;
+      border-radius: 14px;
+      padding: 14px;
+      max-height: 440px;
+      overflow: auto;
+      user-select: text;
+    }
+    .invoice-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    @media (max-width: 640px) {
+      .invoice-actions { grid-template-columns: 1fr; }
+    }
+
   </style>
 </head>
 <body>
@@ -596,7 +642,7 @@
           <div class="summary-sub" id="quickBatch">أدخل الوزن والوقت لظهور النتيجة.</div>
         </div>
         <div class="summary-actions">
-          <button class="btn" id="copyBtn" type="button" disabled>نسخ ملخص الطلب</button>
+          <button class="btn" id="copyBtn" type="button" disabled>نسخ فاتورة التحليل</button>
           <button class="btn secondary" id="resetBtn" type="button">إرجاع الافتراضي</button>
         </div>
       </aside>
@@ -612,6 +658,11 @@
           </div>
 
           <div class="grid-2">
+            <div class="field">
+              <label for="productName">اسم المنتج</label>
+              <input id="productName" name="productName" type="text" placeholder="مثال: ميدالية جيم وجه واحد">
+              <small>يظهر في فاتورة التحليل التي ستنسخها وترسلها.</small>
+            </div>
             <div class="field">
               <label for="qty">عدد القطع المطلوبة</label>
               <input id="qty" name="qty" type="number" inputmode="numeric" min="1" step="1" value="1" required>
@@ -837,6 +888,20 @@
         <h2>النتيجة التفصيلية</h2>
         <div class="status" id="statusBox">أدخل الوزن ووقت الطباعة لعرض الحساب.</div>
         <div id="resultContent" hidden></div>
+
+        <div class="invoice-card" id="invoiceCard" hidden>
+          <div class="invoice-head">
+            <strong>فاتورة تحليل التكلفة</strong>
+            <span class="hint">جاهزة للنسخ والإرسال</span>
+          </div>
+          <div class="invoice-body">
+            <div class="invoice-text" id="invoiceText"></div>
+            <div class="invoice-actions">
+              <button class="btn" id="copyInvoiceBtn" type="button">نسخ الفاتورة كاملة</button>
+              <button class="btn secondary" id="downloadInvoiceBtn" type="button">حفظ كملف TXT</button>
+            </div>
+          </div>
+        </div>
       </aside>
     </section>
   </main>
@@ -860,6 +925,10 @@
     const statMachineHours = document.getElementById("statMachineHours");
     const statElapsed = document.getElementById("statElapsed");
     const toast = document.getElementById("toast");
+    const invoiceCard = document.getElementById("invoiceCard");
+    const invoiceText = document.getElementById("invoiceText");
+    const copyInvoiceBtn = document.getElementById("copyInvoiceBtn");
+    const downloadInvoiceBtn = document.getElementById("downloadInvoiceBtn");
 
     const STORAGE_KEY = "ravenlab_print_pricing_v5";
 
@@ -872,6 +941,7 @@
     };
 
     const defaults = {
+      productName: "",
       qty: 1,
       filamentType: "pla_plus",
       filamentPrice: 25000,
@@ -960,6 +1030,7 @@
       copyBtn.disabled = true;
       quickSingle.textContent = "—";
       quickBatch.textContent = message;
+      invoiceCard.hidden = true;
     }
 
     function showToast(message) {
@@ -1167,23 +1238,83 @@
         </div>
       `;
 
-      lastSummary = [
-        "ملخص تسعير RavenLab",
-        `الكمية: ${qty} قطعة`,
-        `الفلمنت: ${filamentLabel}`,
+      const productName = (document.getElementById("productName").value || "غير محدد").trim();
+      const perRunWeight = selectedWeightMode === "perRun" ? weightInput : (runs > 0 ? totalWeight / runs : 0);
+      const perRunHours = selectedHoursMode === "perRun" ? hoursInput : (runs > 0 ? totalMachineHours / runs : 0);
+      const extraPerPiece =
+        Math.max(0, numberValue("paint", 0)) +
+        Math.max(0, numberValue("packaging", 0)) +
+        Math.max(0, numberValue("switchCost", 0)) +
+        Math.max(0, numberValue("keychain", 0));
+
+      const invoiceLines = [
+        "RAVENLAB — فاتورة تحليل تكلفة وتسعير",
+        "================================",
+        `المنتج: ${productName}`,
+        `الكمية المطلوبة: ${qty} قطعة`,
+        "",
+        "【 الفلمنت 】",
+        `النوع: ${filamentLabel}`,
         `سعر الكيلو: ${money(kgPrice)}`,
-        `سعة الطبعة: ${piecesPerRun} قطعة`,
-        `عدد الطبعات: ${runs}`,
-        `عدد الطابعات: ${printersCount}`,
-        `مدة الإنجاز التقريبية: ${formatHours(elapsedHours)}`,
+        `سعر الغرام: ${(kgPrice / 1000).toFixed(2)} د.ع`,
+        "",
+        "【 خطة الطباعة 】",
+        `سعة الطبعة الواحدة: ${piecesPerRun} قطعة`,
+        `عدد الطبعات المطلوبة: ${runs}`,
+        `عدد الطابعات المستخدمة: ${printersCount}`,
+        `جولات التشغيل المتوازية: ${waves}`,
+        `وزن الطبعة الواحدة تقريباً: ${perRunWeight.toFixed(1)} غرام`,
+        `وقت الطبعة الواحدة تقريباً: ${formatHours(perRunHours)}`,
         `إجمالي ساعات تشغيل الطابعات: ${formatHours(totalMachineHours)}`,
+        `مدة الإنجاز التقريبية: ${formatHours(elapsedHours)}`,
+        "",
+        "【 المواد والتشغيل 】",
+        `الوزن قبل الهالك: ${totalWeight.toFixed(1)} غرام`,
+        `نسبة هالك المواد: ${(waste * 100).toFixed(0)}%`,
+        `الوزن بعد الهالك: ${materialWeight.toFixed(1)} غرام`,
+        `تكلفة الفلمنت: ${money(materialCost)}`,
+        `استهلاك الطابعة/ساعة: ${money(printerRate)}`,
+        `الكهرباء/ساعة: ${money(electricityRate)}`,
+        `الصيانة/ساعة: ${money(maintenanceRate)}`,
+        `إجمالي تكلفة التشغيل/ساعة: ${money(hourlyOperatingCost)}`,
+        `تكلفة تشغيل الطابعات: ${money(machineCost)}`,
+        `نسبة احتياطي فشل الطباعة: ${(fail * 100).toFixed(0)}%`,
+        `قيمة احتياطي الفشل: ${money(failureReserve)}`,
+        "",
+        "【 تكاليف إضافية 】",
+        `تلوين/تشطيب لكل قطعة: ${money(Math.max(0, numberValue("paint", 0)))}`,
+        `تغليف لكل قطعة: ${money(Math.max(0, numberValue("packaging", 0)))}`,
+        `سويتش لكل قطعة: ${money(Math.max(0, numberValue("switchCost", 0)))}`,
+        `ميدالية/إكسسوار لكل قطعة: ${money(Math.max(0, numberValue("keychain", 0)))}`,
+        `إجمالي الإضافات لكل قطعة: ${money(extraPerPiece)}`,
+        `إجمالي إضافات جميع القطع: ${money(perPieceCosts)}`,
+        `تصميم للطلب: ${money(Math.max(0, numberValue("design", 0)))}`,
+        `تسويق/منصة للطلب: ${money(Math.max(0, numberValue("marketing", 0)))}`,
+        `عمولة موظف المبيعات: ${money(Math.max(0, numberValue("salesCommission", 0)))}`,
+        `أجور العمالة: ${money(laborCost)} (${(workers * 100).toFixed(0)}%)`,
+        "",
+        "【 التكلفة الفعلية 】",
         `تكلفة الطلب قبل الربح: ${money(totalCost)}`,
         `تكلفة القطعة قبل الربح: ${money(costPerPiece)}`,
+        "",
+        "【 التسعير الحالي في الحاسبة 】",
+        `نسبة الزيادة فوق التكلفة: ${(profit * 100).toFixed(0)}%`,
+        `رسوم/خصومات الدفع: ${(taxes * 100).toFixed(1)}% = ${money(paymentFees)}`,
         `سعر القطعة المقترح: ${money(roundedSingle)}`,
         `سعر الطلب المقترح: ${money(roundedBatch)}`,
         `الربح المتوقع: ${money(netProfit)}`,
-        `هامش الربح: ${margin.toFixed(1)}%`
-      ].join("\n");
+        `هامش الربح الناتج: ${margin.toFixed(1)}%`,
+        `التوصيل: ${money(delivery)}`,
+        `الإجمالي مع التوصيل: ${money(totalWithDelivery)}`,
+        "",
+        "【 المطلوب من ChatGPT 】",
+        "حلّل هذه التكلفة واقترح لي سعر جملة مناسب للكمية، مع سعر القطعة، إجمالي الطلب، الربح، هامش الربح، وهل السعر مناسب لطاقة الطابعات ووقت الإنتاج."
+      ];
+
+      lastSummary = invoiceLines.join("
+");
+      invoiceText.textContent = lastSummary;
+      invoiceCard.hidden = false;
 
       saveForm();
       return { roundedSingle, roundedBatch, totalWithDelivery };
@@ -1193,7 +1324,7 @@
       if (!lastSummary) return;
       try {
         await navigator.clipboard.writeText(lastSummary);
-        showToast("تم نسخ ملخص الطلب.");
+        showToast("تم نسخ فاتورة التحليل.");
       } catch (error) {
         const area = document.createElement("textarea");
         area.value = lastSummary;
@@ -1201,7 +1332,7 @@
         area.select();
         document.execCommand("copy");
         area.remove();
-        showToast("تم نسخ ملخص الطلب.");
+        showToast("تم نسخ فاتورة التحليل.");
       }
     }
 
@@ -1216,7 +1347,42 @@
 
     form.addEventListener("input", calculate);
     form.addEventListener("change", calculate);
+    async function copyInvoice() {
+      if (!lastSummary) return;
+      try {
+        await navigator.clipboard.writeText(lastSummary);
+        showToast("تم نسخ الفاتورة كاملة.");
+      } catch (error) {
+        const area = document.createElement("textarea");
+        area.value = lastSummary;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+        showToast("تم نسخ الفاتورة كاملة.");
+      }
+    }
+
+    function downloadInvoice() {
+      if (!lastSummary) return;
+      const safeName = (document.getElementById("productName").value || "product")
+        .trim()
+        .replace(/[\\/:*?"<>|]+/g, "-");
+      const blob = new Blob(["\ufeff" + lastSummary], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `RavenLab-${safeName}-cost-invoice.txt`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast("تم حفظ ملف الفاتورة.");
+    }
+
     copyBtn.addEventListener("click", copySummary);
+    copyInvoiceBtn.addEventListener("click", copyInvoice);
+    downloadInvoiceBtn.addEventListener("click", downloadInvoice);
     resetBtn.addEventListener("click", resetForm);
 
     loadForm();
