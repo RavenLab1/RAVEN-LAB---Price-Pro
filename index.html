@@ -553,7 +553,7 @@
     .readonly-input { opacity: .88; cursor: default; }
     .production-preview {
       display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
+      grid-template-columns:repeat(3,minmax(0,1fr));
       gap:10px;
       margin-top:13px;
     }
@@ -637,7 +637,7 @@
 
       <aside class="summary-card" aria-live="polite">
         <div>
-          <div class="summary-label">السعر المقترح للقطعة الواحدة</div>
+          <div class="summary-label">متوسط سعر القطعة ضمن الطلب</div>
           <div class="summary-price" id="quickSingle">—</div>
           <div class="summary-sub" id="quickBatch">أدخل الوزن والوقت لظهور النتيجة.</div>
         </div>
@@ -686,8 +686,8 @@
           <div class="grid-2" style="margin-top:13px">
             <div class="field">
               <label for="filamentPrice">سعر الكيلو د.ع</label>
-              <input id="filamentPrice" name="filamentPrice" class="readonly-input" type="number" inputmode="decimal" min="0" step="500" value="25000" readonly>
-              <small id="filamentPriceHint">يتغير تلقائياً حسب نوع الفلمنت. يصبح قابلاً للتعديل عند اختيار «مخصص».</small>
+              <input id="filamentPrice" name="filamentPrice" type="number" inputmode="decimal" min="0" step="500" value="25000">
+              <small id="filamentPriceHint">يتغير تلقائياً عند اختيار نوع الفلمنت، ويمكنك تعديله يدوياً في أي وقت.</small>
             </div>
             <div class="field">
               <label for="roundTo">تقريب سعر البيع إلى أقرب</label>
@@ -715,14 +715,14 @@
               <small>عدد القطع التي تدخل على سرير الطابعة في مرة واحدة.</small>
             </div>
             <div class="field">
-              <label for="printersCount">عدد الطابعات المستخدمة</label>
+              <label for="printersCount">عدد الطابعات المتاحة للطلب</label>
               <input id="printersCount" name="printersCount" type="number" inputmode="numeric" min="1" step="1" value="1">
-              <small>يقلل مدة إنجاز الطلب، لكنه لا يلغي ساعات تشغيل الطابعات.</small>
+              <small>اكتب عدد الطابعات التي تستطيع تشغيلها بالتوازي. الحاسبة تحدد كم طابعة تحتاج فعلياً.</small>
             </div>
             <div class="field">
-              <label for="printRuns">عدد مرات الطباعة المطلوبة</label>
+              <label for="printRuns">إجمالي الطبعات المطلوبة</label>
               <input id="printRuns" type="number" value="1" readonly class="readonly-input">
-              <small>يُحسب تلقائياً من الكمية ÷ سعة الطبعة.</small>
+              <small>عدد أسرّة/Jobs الطباعة الكلي: الكمية ÷ سعة الطبعة الواحدة.</small>
             </div>
           </div>
 
@@ -764,13 +764,16 @@
           </div>
 
           <div class="production-preview">
-            <div class="production-stat accent"><span>عدد الطبعات</span><b id="statRuns">1</b></div>
-            <div class="production-stat"><span>جولات التشغيل</span><b id="statWaves">1</b></div>
+            <div class="production-stat accent"><span>إجمالي الطبعات</span><b id="statRuns">1</b></div>
+            <div class="production-stat"><span>الطابعات المستخدمة فعلياً</span><b id="statActivePrinters">1</b></div>
+            <div class="production-stat"><span>الجولات الزمنية</span><b id="statWaves">1</b></div>
+            <div class="production-stat"><span>قدرة الجولة الواحدة</span><b id="statRoundCapacity">1 قطعة</b></div>
             <div class="production-stat"><span>إجمالي ساعات الطابعات</span><b id="statMachineHours">—</b></div>
             <div class="production-stat"><span>مدة الإنجاز التقريبية</span><b id="statElapsed">—</b></div>
           </div>
+          <div class="pill-note" id="printerDistribution">توزيع الطبعات على الطابعات سيظهر هنا.</div>
 
-          <div class="pill-note">💡 عند تشغيل أكثر من طابعة بالتوازي تقل مدة الإنجاز، بينما تكلفة التشغيل تعتمد على مجموع ساعات جميع الطابعات.</div>
+          <div class="pill-note">💡 مثال: 100 قطعة، 50 قطعة لكل طبعة، وطابعتان = طبعتان كلياً، جولة زمنية واحدة، وكل طابعة تشغّل طبعة واحدة.</div>
         </div>
 
 
@@ -921,6 +924,9 @@
     const filamentPriceHint = document.getElementById("filamentPriceHint");
     const printRunsInput = document.getElementById("printRuns");
     const statRuns = document.getElementById("statRuns");
+    const statActivePrinters = document.getElementById("statActivePrinters");
+    const statRoundCapacity = document.getElementById("statRoundCapacity");
+    const printerDistribution = document.getElementById("printerDistribution");
     const statWaves = document.getElementById("statWaves");
     const statMachineHours = document.getElementById("statMachineHours");
     const statElapsed = document.getElementById("statElapsed");
@@ -1007,19 +1013,20 @@
       return `${hours} س ${minutes} د`;
     }
 
-    function syncFilamentPrice() {
+    function syncFilamentPrice(forcePreset = false) {
       const type = filamentType.value;
+
       if (type === "custom") {
-        filamentPrice.readOnly = false;
-        filamentPrice.classList.remove("readonly-input");
-        filamentPriceHint.textContent = "أدخل سعر الكيلو يدوياً.";
+        filamentPriceHint.textContent = "نوع مخصص: أدخل سعر الكيلو يدوياً.";
         return;
       }
 
-      filamentPrice.value = FILAMENT_PRICES[type];
-      filamentPrice.readOnly = true;
-      filamentPrice.classList.add("readonly-input");
-      filamentPriceHint.textContent = "السعر مربوط بنوع الفلمنت ويتغير تلقائياً.";
+      if (forcePreset || !filamentPrice.value) {
+        filamentPrice.value = FILAMENT_PRICES[type];
+      }
+
+      filamentPriceHint.textContent =
+        `السعر الافتراضي لهذا النوع ${money(FILAMENT_PRICES[type])} / كغم — يمكنك تعديله يدوياً.`;
     }
 
     function setStatus(message, type = "normal") {
@@ -1064,7 +1071,7 @@
       } catch (error) {
         console.warn("Could not load saved calculator data", error);
       }
-      syncFilamentPrice();
+      syncFilamentPrice(false);
     }
 
     function resetForm() {
@@ -1073,7 +1080,7 @@
         if (el) el.value = value;
       });
       localStorage.removeItem(STORAGE_KEY);
-      syncFilamentPrice();
+      syncFilamentPrice(true);
       calculate();
       showToast("تمت إعادة القيم الافتراضية.");
     }
@@ -1081,20 +1088,55 @@
     function productionPlan() {
       const qty = Math.max(1, Math.floor(numberValue("qty", 1)));
       const piecesPerRun = Math.max(1, Math.floor(numberValue("piecesPerRun", 1)));
-      const printersCount = Math.max(1, Math.floor(numberValue("printersCount", 1)));
+      const requestedPrinters = Math.max(1, Math.floor(numberValue("printersCount", 1)));
+
+      // Physical print jobs / build plates required.
       const runs = Math.ceil(qty / piecesPerRun);
-      const waves = Math.ceil(runs / printersCount);
+
+      // You cannot use more printers than the number of jobs that exist.
+      const activePrinters = Math.max(1, Math.min(requestedPrinters, runs));
+
+      // Number of actual time waves when jobs are distributed across active printers.
+      const waves = Math.ceil(runs / activePrinters);
+      const roundCapacity = piecesPerRun * activePrinters;
+
+      // Balanced job distribution across printers.
+      const baseJobs = Math.floor(runs / activePrinters);
+      const remainder = runs % activePrinters;
+      const jobsPerPrinter = Array.from(
+        { length: activePrinters },
+        (_, index) => baseJobs + (index < remainder ? 1 : 0)
+      );
 
       printRunsInput.value = runs;
       statRuns.textContent = runs.toLocaleString("en-US");
+      statActivePrinters.textContent =
+        activePrinters === requestedPrinters
+          ? activePrinters.toLocaleString("en-US")
+          : `${activePrinters} من ${requestedPrinters}`;
       statWaves.textContent = waves.toLocaleString("en-US");
+      statRoundCapacity.textContent = `${roundCapacity.toLocaleString("en-US")} قطعة`;
 
-      return { qty, piecesPerRun, printersCount, runs, waves };
+      printerDistribution.textContent =
+        `توزيع الطبعات: ${jobsPerPrinter
+          .map((jobs, i) => `طابعة ${i + 1}: ${jobs} ${jobs === 1 ? "طبعة" : "طبعات"}`)
+          .join(" — ")}`;
+
+      return {
+        qty,
+        piecesPerRun,
+        requestedPrinters,
+        activePrinters,
+        runs,
+        waves,
+        roundCapacity,
+        jobsPerPrinter
+      };
     }
 
     function calculate() {
       const plan = productionPlan();
-      const { qty, piecesPerRun, printersCount, runs, waves } = plan;
+      const { qty, piecesPerRun, requestedPrinters, activePrinters, runs, waves, roundCapacity, jobsPerPrinter } = plan;
 
       const weightInput = numberValue("weight", 0);
       const hoursInput = numberValue("hours", 0) + (clamp(numberValue("minutes", 0), 0, 59) / 60);
@@ -1115,10 +1157,10 @@
         elapsedHours = hoursInput * waves;
       } else if (selectedHoursMode === "single") {
         totalMachineHours = hoursInput * qty;
-        elapsedHours = totalMachineHours / printersCount;
+        elapsedHours = totalMachineHours / activePrinters;
       } else {
         totalMachineHours = hoursInput;
-        elapsedHours = totalMachineHours / printersCount;
+        elapsedHours = totalMachineHours / activePrinters;
       }
 
       statMachineHours.textContent = hoursInput > 0 ? formatHours(totalMachineHours) : "—";
@@ -1173,7 +1215,7 @@
       const paymentFees = taxes > 0 ? beforeTaxPrice * taxes / (1 - taxes) : 0;
       const sellBatch = beforeTaxPrice + paymentFees;
       const roundedBatch = roundUp(sellBatch, roundTo);
-      const roundedSingle = roundUp(Math.max(sellBatch / qty, minPrice), roundTo);
+      const roundedSingle = roundedBatch / qty;
       const totalWithDelivery = roundedBatch + delivery;
       const netProfit = roundedBatch - totalCost;
       const margin = roundedBatch > 0 ? (netProfit / roundedBatch) * 100 : 0;
@@ -1189,7 +1231,7 @@
       resultContent.innerHTML = `
         <div class="price-grid">
           <div class="price-box strong">
-            <span>سعر البيع المقترح للقطعة الواحدة</span>
+            <span>متوسط سعر القطعة ضمن الطلب</span>
             <b>${money(roundedSingle)}</b>
           </div>
           <div class="price-box success">
@@ -1216,7 +1258,10 @@
           <div class="line"><span>عدد القطع</span><b>${qty}</b></div>
           <div class="line"><span>سعة الطبعة الواحدة</span><b>${piecesPerRun} قطعة</b></div>
           <div class="line"><span>عدد الطبعات المطلوبة</span><b>${runs}</b></div>
-          <div class="line"><span>عدد الطابعات المستخدمة</span><b>${printersCount}</b></div>
+          <div class="line"><span>الطابعات المتاحة</span><b>${requestedPrinters}</b></div>
+          <div class="line"><span>الطابعات المستخدمة فعلياً</span><b>${activePrinters}</b></div>
+          <div class="line"><span>قدرة الجولة الواحدة</span><b>${roundCapacity} قطعة</b></div>
+          <div class="line"><span>توزيع الطبعات</span><b>${jobsPerPrinter.map((j,i) => `P${i+1}:${j}`).join(" | ")}</b></div>
           <div class="line"><span>جولات التشغيل المتوازية</span><b>${waves}</b></div>
           <div class="line"><span>إجمالي ساعات تشغيل الطابعات</span><b>${formatHours(totalMachineHours)}</b></div>
           <div class="line"><span>مدة الإنجاز التقريبية</span><b>${formatHours(elapsedHours)}</b></div>
@@ -1234,7 +1279,7 @@
         </div>
 
         <div class="final-note">
-          عدد الطابعات يقلل وقت إنجاز الطلب عند تشغيل الطبعات بالتوازي، لكنه لا يخفض مجموع ساعات تشغيل الطابعات المستخدمة في حساب التكلفة.
+          الحاسبة تفرّق الآن بين إجمالي الطبعات والطابعات المستخدمة فعلياً والجولات الزمنية. تكلفة التشغيل تعتمد على مجموع ساعات الطابعات، بينما مدة الإنجاز تعتمد على عدد الجولات.
         </div>
       `;
 
@@ -1261,7 +1306,10 @@
         "【 خطة الطباعة 】",
         `سعة الطبعة الواحدة: ${piecesPerRun} قطعة`,
         `عدد الطبعات المطلوبة: ${runs}`,
-        `عدد الطابعات المستخدمة: ${printersCount}`,
+        `الطابعات المتاحة للطلب: ${requestedPrinters}`,
+        `الطابعات المستخدمة فعلياً: ${activePrinters}`,
+        `قدرة الجولة الواحدة: ${roundCapacity} قطعة`,
+        `توزيع الطبعات: ${jobsPerPrinter.map((jobs, i) => `طابعة ${i + 1} = ${jobs} ${jobs === 1 ? "طبعة" : "طبعات"}`).join(" — ")}`,
         `جولات التشغيل المتوازية: ${waves}`,
         `وزن الطبعة الواحدة تقريباً: ${perRunWeight.toFixed(1)} غرام`,
         `وقت الطبعة الواحدة تقريباً: ${formatHours(perRunHours)}`,
@@ -1311,8 +1359,7 @@
         "حلّل هذه التكلفة واقترح لي سعر جملة مناسب للكمية، مع سعر القطعة، إجمالي الطلب، الربح، هامش الربح، وهل السعر مناسب لطاقة الطابعات ووقت الإنتاج."
       ];
 
-      lastSummary = invoiceLines.join("
-");
+      lastSummary = invoiceLines.join("\n");
       invoiceText.textContent = lastSummary;
       invoiceCard.hidden = false;
 
@@ -1337,12 +1384,19 @@
     }
 
     filamentType.addEventListener("change", () => {
-      syncFilamentPrice();
+      syncFilamentPrice(true);
       calculate();
     });
 
     filamentPrice.addEventListener("input", () => {
-      if (filamentType.value === "custom") calculate();
+      if (filamentType.value !== "custom") {
+        const preset = FILAMENT_PRICES[filamentType.value];
+        filamentPriceHint.textContent =
+          Number(filamentPrice.value) === preset
+            ? `السعر الافتراضي لهذا النوع ${money(preset)} / كغم.`
+            : `تم تعديل السعر يدوياً. السعر الافتراضي لهذا النوع ${money(preset)} / كغم.`;
+      }
+      calculate();
     });
 
     form.addEventListener("input", calculate);
